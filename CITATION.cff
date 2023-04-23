@@ -1,0 +1,16 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: DiCARP
+message: Distributed Consensus Algorithm with Radial Partitioning
+type: software
+authors:
+  - given-names: Mehdi
+    family-names: Karimi
+    email: mkarim3@ilstu.edu
+keywords:
+  - Distributed Algorithm
+  - Power Systems
+license: MIT
+version: '1.0'
