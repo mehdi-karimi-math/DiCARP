@@ -6,4 +6,11 @@ Some case instances from the MATPOWER library that are trasformed into Pyomo dat
 
 # Using DiCARP
 
-For using DiCARP, Python, DiCARP, and the required modules must be installed. This code is using Ipopt as the underlying solver, which must be installed. The easiest way to do is dwnloading `ipopt.exe` from this [site](https://www.coin-or.org/download/binary/Ipopt/) and putting it in the required forlder. 
+For using DiCARP, Python, DiCARP, and the required modules must be installed. This code is using Ipopt as the underlying solver, which must be installed. The easiest way to do is downloading `ipopt.exe` from this [site](https://www.coin-or.org/download/binary/Ipopt/) and putting it in the required forlder. 
+
+The `main` file has a code to run DiCARP for a given problem instance. The parameters to set are:
+
++ `problem`: A string with the name of the problem, for example `"case9"`.
++ `rho`: The parameter of the distributed algorithm. 
++ `tol`: The tolerance for the stopping criteria. 
++ `mat_iter`: Maximum number of iterations set for the distributed algorithm.  
