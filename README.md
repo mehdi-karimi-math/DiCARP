@@ -14,3 +14,5 @@ The `main` file has a code to run DiCARP for a given problem instance. The param
 + `rho`: The parameter of the distributed algorithm. 
 + `tol`: The tolerance for the stopping criteria. 
 + `mat_iter`: Maximum number of iterations set for the distributed algorithm.  
+
+The main function is `DCA_algorithm` which returns a python dictionary with the results and statistics of the distributed algorithm. 
