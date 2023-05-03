@@ -16,3 +16,9 @@ The `main` file has a code to run DiCARP for a given problem instance. The param
 + `mat_iter`: Maximum number of iterations set for the distributed algorithm.  
 
 The main function is `DCA_algorithm` which returns a python dictionary with the results and statistics of the distributed algorithm. 
+
+# Citation
+
+DiCARP is based on the following manuscript:
+
+Mehdi Karimi. **Distributed Optimization for Power Systems with Radial Partitioning**, [https://arxiv.org/abs/2305.01032](https://arxiv.org/abs/2305.01032), 2023. 
