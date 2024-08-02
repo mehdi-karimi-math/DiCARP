@@ -21,7 +21,9 @@ fileID = fopen(filename, 'w');
 base = mpc.baseMVA;
 
 %% bus data
-bus = mpc.bus; n = size(bus,1);
+bus = mpc.bus;
+n = size(bus,1);
+
 % slack
 slack = find(bus(:,2) == 3); angslack = bus(slack,9)*pi/180;
 % loads
@@ -33,6 +35,9 @@ gs = sparse(bus(:,5)/base); bs = sparse(bus(:,6)/base);
 %
 %% branch data
 branch = mpc.branch; nBranch = size(branch,1);
+e1=[26 29 45 89 90 91 92 93];
+branch(e1,:)
+branch(89,:)
 % from to
 from = branch(:,1); to = branch(:,2);
 % series admittance
