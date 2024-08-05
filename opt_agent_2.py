@@ -24,6 +24,7 @@ mo_agent_2.vi_neigh = Set(ordered=False, within=mo_agent_2.vi_region_all)
 mo_agent_2.ei_region = Set(ordered=False, within=mo_agent_2.ei)
 mo_agent_2.ei_neigh = Set(ordered=False, within=mo_agent_2.ei)
 mo_agent_2.gi_region = Set(ordered=False, within=mo_agent_2.gi)
+mo_agent_2.gi_neigh = Set(ordered=False, within=mo_agent_2.gi)
 
 mo_agent_2.slack = Param(within=mo_agent_2.vi)
 mo_agent_2.angslack = Param()
@@ -60,16 +61,41 @@ mo_agent_2.c2 = Param(mo_agent_2.gi, within = NonNegativeReals)
 mo_agent_2.c1 = Param(mo_agent_2.gi, within = NonNegativeReals)
 mo_agent_2.c0 = Param(mo_agent_2.gi, within = NonNegativeReals)
 
-mo_agent_2.v_pg = Var(mo_agent_2.gi_region)
-mo_agent_2.v_qg = Var(mo_agent_2.gi_region)
-mo_agent_2.v_vm = Var(mo_agent_2.vi_region_all)
-mo_agent_2.v_va = Var(mo_agent_2.vi_region_all)
+def init_rule_pg(m,i,j):
+    i = (i,j)
+    if m.pGl[i] == '-Inf' and m.pGu[i] == 'Inf':
+      return 0
+    elif m.pGl[i] == '-Inf':
+      return 0
+    elif m.pGu[i] == 'Inf':
+      return 0
+    else: 
+      return  (m.pGl[i]+m.pGu[i])/2
+mo_agent_2.v_pg = Var(mo_agent_2.gi_region | mo_agent_2.gi_neigh, initialize=init_rule_pg)
+def init_rule_qg(m,i,j):
+    i = (i,j)
+    if m.qGl[i] == '-Inf' and m.qGu[i] == 'Inf':
+      return 0
+    elif m.qGl[i] == '-Inf':
+      return 0
+    elif m.qGu[i] == 'Inf':
+      return 0
+    else: 
+      return  (m.qGl[i]+m.qGu[i])/2
+mo_agent_2.v_qg = Var(mo_agent_2.gi_region | mo_agent_2.gi_neigh, initialize=init_rule_qg)
+def init_rule_vm(model, i):
+    return 1
+mo_agent_2.v_vm = Var(mo_agent_2.vi_region_all, initialize=init_rule_vm)
+def init_rule_va(model, i):
+    return 0
+mo_agent_2.v_va = Var(mo_agent_2.vi_region_all, initialize=init_rule_va)
 mo_agent_2.v_pt = Var(mo_agent_2.ei_region)
 mo_agent_2.v_pf = Var(mo_agent_2.ei_region)
 mo_agent_2.v_qt = Var(mo_agent_2.ei_region)
 mo_agent_2.v_qf = Var(mo_agent_2.ei_region)
 
-mo_agent_2.rho = Param(within = NonNegativeReals)
+mo_agent_2.rhov = Param(within = NonNegativeReals)
+mo_agent_2.rhop = Param(within = NonNegativeReals)
 
 def beta_vm_ini(m,i):
     return 1
@@ -95,17 +121,37 @@ def beta_qf_ini(m,i):
     return 1
 mo_agent_2.beta_qf = Param(mo_agent_2.ei_neigh, mutable =True, initialize=beta_qf_ini)
 
+def beta_pg_ini(m,i,j):
+    return 1
+mo_agent_2.beta_pg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=beta_pg_ini)
+
+def beta_qg_ini(m,i,j):
+    return 1
+mo_agent_2.beta_qg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=beta_qg_ini)
+
 def dm_ini(m,i):
-    return m.rho #/(len(list(m.vi_neigh))/m.nv)
+    return m.rhov #/(len(list(m.vi_neigh))/m.nv)
 mo_agent_2.dm = Param(mo_agent_2.vi_neigh, mutable =True, initialize=dm_ini)
 
 def da_ini(m,i):
-    return 2*m.rho # /(len(list(m.vi_neigh))/m.nv)
+    return m.rhov # /(len(list(m.vi_neigh))/m.nv)
 mo_agent_2.da = Param(mo_agent_2.vi_neigh, mutable =True, initialize=da_ini)
 
-def dpq_ini(m,i):
-    return 2*m.rho # /(len(list(m.vi_neigh))/m.nv)
-mo_agent_2.dpq = Param(mo_agent_2.ei_neigh, mutable =True, initialize=dpq_ini)
+def dp_ini(m,i):
+    return m.rhop # /(len(list(m.vi_neigh))/m.nv)
+mo_agent_2.dp = Param(mo_agent_2.ei_neigh, mutable =True, initialize=dp_ini)
+
+def dq_ini(m,i):
+    return m.rhop # /(len(list(m.vi_neigh))/m.nv)
+mo_agent_2.dq = Param(mo_agent_2.ei_neigh, mutable =True, initialize=dq_ini)
+
+def dpg_ini(m,i,j):
+    return m.rhop # /(len(list(m.vi_neigh))/m.nv)
+mo_agent_2.dpg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=dpg_ini)
+
+def dqg_ini(m,i,j):
+    return m.rhop # /(len(list(m.vi_neigh))/m.nv)
+mo_agent_2.dqg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=dqg_ini)
 
 def ym_ini(m,i):
     return 0
@@ -131,6 +177,46 @@ def yqf_ini(m,i):
     return 0
 mo_agent_2.yqf = Param(mo_agent_2.ei_neigh, mutable =True, initialize=yqf_ini)
 
+def ypg_ini(m,i,j):
+    return 0
+mo_agent_2.ypg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=ypg_ini)
+
+def yqg_ini(m,i,j):
+    return 0
+mo_agent_2.yqg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=yqg_ini)
+
+def yhm_ini(m,i):
+    return 0
+mo_agent_2.yhm = Param(mo_agent_2.vi_neigh, mutable =True, initialize=yhm_ini)
+
+def yha_ini(m,i):
+    return 0
+mo_agent_2.yha = Param(mo_agent_2.vi_neigh, mutable =True, initialize=yha_ini)
+
+def yhpt_ini(m,i):
+    return 0
+mo_agent_2.yhpt = Param(mo_agent_2.ei_neigh, mutable =True, initialize=yhpt_ini)
+
+def yhpf_ini(m,i):
+    return 0
+mo_agent_2.yhpf = Param(mo_agent_2.ei_neigh, mutable =True, initialize=yhpf_ini)
+
+def yhqt_ini(m,i):
+    return 0
+mo_agent_2.yhqt = Param(mo_agent_2.ei_neigh, mutable =True, initialize=yhqt_ini)
+
+def yhqf_ini(m,i):
+    return 0
+mo_agent_2.yhqf = Param(mo_agent_2.ei_neigh, mutable =True, initialize=yhqf_ini)
+
+def yhpg_ini(m,i,j):
+    return 0
+mo_agent_2.yhpg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=yhpg_ini)
+
+def yhqg_ini(m,i,j):
+    return 0
+mo_agent_2.yhqg = Param(mo_agent_2.gi_neigh, mutable =True, initialize=yhqg_ini)
+
 def active_power_rule(m, i,j):
   i = (i,j)
   if m.pGl[i] == '-Inf' and m.pGu[i] == 'Inf':
@@ -141,7 +227,7 @@ def active_power_rule(m, i,j):
     return m.pGl[i] <= m.v_pg[i]
   else: 
     return  (m.pGl[i], m.v_pg[i], m.pGu[i]) 
-mo_agent_2.active_power_const = Constraint(mo_agent_2.gi_region, rule=active_power_rule)
+mo_agent_2.active_power_const = Constraint(mo_agent_2.gi_region | mo_agent_2.gi_neigh, rule=active_power_rule)
 
 def reactive_power_rule(m, i, j):
   i = (i,j)
@@ -153,7 +239,7 @@ def reactive_power_rule(m, i, j):
     return m.qGl[i] <= m.v_qg[i]
   else: 
     return  (m.qGl[i], m.v_qg[i], m.qGu[i]) 
-mo_agent_2.reactive_power_const = Constraint(mo_agent_2.gi_region, rule=reactive_power_rule)
+mo_agent_2.reactive_power_const = Constraint(mo_agent_2.gi_region | mo_agent_2.gi_neigh, rule=reactive_power_rule)
 
 def active_power_eqn(m,i):
   f1 = sum(m.v_pf[j] for j in m.ei if m.fr[j] == i)
@@ -239,13 +325,17 @@ def ObjRule(m):
     f3m = sum([m.ym[i]*(m.v_vm[i]-m.beta_vm[i]) for i in m.vi_neigh])
     f2a = sum([(m.da[i]/2)*(m.v_va[i]-m.beta_va[i])**2 for i in m.vi_neigh])
     f3a = sum([m.ya[i]*(m.v_va[i]-m.beta_va[i]) for i in m.vi_neigh])
-    f2pt = sum([(m.dpq[i]/2)*(m.v_pt[i]-m.beta_pt[i])**2 for i in m.ei_neigh])
-    f2pf = sum([(m.dpq[i]/2)*(m.v_pf[i]-m.beta_pf[i])**2 for i in m.ei_neigh])
-    f2qt = sum([(m.dpq[i]/2)*(m.v_qt[i]-m.beta_qt[i])**2 for i in m.ei_neigh])
-    f2qf = sum([(m.dpq[i]/2)*(m.v_qf[i]-m.beta_qf[i])**2 for i in m.ei_neigh])
+    f2pt = sum([(m.dp[i]/2)*(m.v_pt[i]-m.beta_pt[i])**2 for i in m.ei_neigh])
+    f2pf = sum([(m.dp[i]/2)*(m.v_pf[i]-m.beta_pf[i])**2 for i in m.ei_neigh])
+    f2qt = sum([(m.dq[i]/2)*(m.v_qt[i]-m.beta_qt[i])**2 for i in m.ei_neigh])
+    f2qf = sum([(m.dq[i]/2)*(m.v_qf[i]-m.beta_qf[i])**2 for i in m.ei_neigh])
+    f2pg = sum([(m.dpg[i]/2)*(m.v_pg[i]-m.beta_pg[i])**2 for i in m.gi_neigh])
+    f2qg = sum([(m.dqg[i]/2)*(m.v_qg[i]-m.beta_qg[i])**2 for i in m.gi_neigh])
     f3pt = sum([m.ypt[i]*(m.v_pt[i]-m.beta_pt[i]) for i in m.ei_neigh])
     f3pf = sum([m.ypf[i]*(m.v_pf[i]-m.beta_pf[i]) for i in m.ei_neigh])
     f3qt = sum([m.yqt[i]*(m.v_qt[i]-m.beta_qt[i]) for i in m.ei_neigh])
     f3qf = sum([m.yqf[i]*(m.v_qf[i]-m.beta_qf[i]) for i in m.ei_neigh])
-    return f1+f2m+f3m+f2a+f3a+f2pt+f2pf+f2qt+f2qf+f3pt+f3pf+f3qt+f3qf
+    f3pg = sum([m.ypg[i]*(m.v_pg[i]-m.beta_pg[i]) for i in m.gi_neigh])
+    f3qg = sum([m.yqg[i]*(m.v_qg[i]-m.beta_qg[i]) for i in m.gi_neigh])
+    return f1+f2m+f3m+f2a+f3a+f2pt+f2pf+f2qt+f2qf+f3pt+f3pf+f3qt+f3qf+f2pg+f2qg+f3pg+f3qg
 mo_agent_2.obj = Objective(rule=ObjRule)
