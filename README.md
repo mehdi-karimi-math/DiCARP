@@ -21,4 +21,4 @@ The main function is `DCA_algorithm` which returns a python dictionary with the 
 
 DiCARP is based on the following manuscript:
 
-Mehdi Karimi. **Distributed Optimization for Power Systems with Radial Partitioning**, [https://arxiv.org/abs/2305.01032](https://arxiv.org/abs/2305.01032), 2023. 
+Mehdi Karimi. **Radial Partitioning with Spectral Penalty Parameter Selection in Distributed Optimization for Power Systems**, [https://arxiv.org/abs/2305.01032](https://arxiv.org/abs/2305.01032), 2024. 
