@@ -166,10 +166,10 @@ def ObjRule(m):
   return sum([m.c2[i]*m.v_pg[i]**2+m.c1[i]*m.v_pg[i]+m.c0[i] for i in m.gi])
 mo.obj = Objective(rule=ObjRule)
 
-# instance=mo.create_instance("Data\case1888rte.dat")
+# instance=mo.create_instance("Data\case24.dat")
 
-# ipopt_res = SolverFactory('ipopt').solve(instance, tee=True)
+# ipopt_res = SolverFactory('ipopt').solve(instance, tee=False)
 
-# print(ipopt_res.Solver)
+# print(ipopt_res.Solver.Time)
 
 # print(value(instance.obj))

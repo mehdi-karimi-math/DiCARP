@@ -22,8 +22,11 @@ tol = .0001
 rho = 50
 
 
-def DCA_algorithm(problem, tol = .0001, rhov = 1000, rhop = 100,  iter = 3000, adaptive = False):
-    regions = create_regions_2(folder+problem)
+def DCA_algorithm(problem, tol = .0001, rhov = 1000, rhop = 100,  iter = 3000, adaptive = False, component = False):
+    if component:
+        regions = create_regions_2_component(folder+problem)
+    else:
+        regions = create_regions_2(folder+problem)
     # print(regions)
     num_R = len(regions)
     # print(num_R)
@@ -84,10 +87,12 @@ def DCA_algorithm(problem, tol = .0001, rhov = 1000, rhop = 100,  iter = 3000, a
         inst_copy = copy.deepcopy(inst)
         # if i==1:
         #     inst_copy_5 = copy.deepcopy(inst)
-
+        solv_time = []
         for m in inst:
-            SolverFactory('ipopt').solve(inst[m], tee=False)
-        
+            ipopt_res = SolverFactory('ipopt').solve(inst[m], tee=False)
+            solv_time.append(ipopt_res.Solver.Time)
+        # print("avg:", np.average(np.array(solv_time)))
+        # print("max:", np.max(np.array(solv_time)))
         
 
         for j in reg_bel:
@@ -372,14 +377,14 @@ def update_parameter_adaptive_2(inst,inst_copy,num_R,reg_bel,reg_bel_eg,reg_bel_
             temp=al
         elif cor_al <= eps and cor_be > eps:
             temp=be
-        cost = 1.5
+        cost = 1.2
         if temp > cost*d:
             temp= cost*d
         elif temp < d/cost:
             temp= d/cost
         
         # print(temp)
-        return max(min(temp,10000),1)
+        return max(min(temp,20000),10)
 
     for j in reg_bel:
         x1 = [(inst[k].yhm[j]-inst_copy[k].yhm[j]) for k in reg_bel[j]]
