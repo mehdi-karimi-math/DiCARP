@@ -9,13 +9,16 @@ import pickle
 from radial_decom import *
 folder = "Data/"
 
-
+num_nodes = 9  # Number of nodes in the network
 problem = "case9" # The name of the problem
 rhov = 10000 # Parameter of the DiCARP algorithm 
 rhop = 1000
+if num_nodes  >= 1000:
+    rhov = 100 # Parameter of the DiCARP algorithm 
+    rhop = 10
 tol = .0001 # Tolerance of the algorithm for stopping criteria
-max_iter = 2000 # maximum number of iterations to run the algorihtm 
-adaptive = False
+max_iter = 4000 # maximum number of iterations to run the algorihtm 
+adaptive = True
 component = False
 
 
